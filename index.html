@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PHEA-ATLAS AI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="glass">
+
+<h1>PHEA-ATLAS AI</h1>
+
+<p class="subtitle">
+
+Physics-Informed Machine Learning Prediction of
+Single-Phase High Entropy Alloys
+
+</p>
+
+<input
+type="text"
+id="search"
+placeholder="Search Element...">
+
+<div id="elements" class="elementsGrid"></div>
+
+<h2>Selected Elements</h2>
+
+<div id="selectedElements"></div>
+
+<div class="totalBox">
+
+Total :
+<span id="totalPercent">0 %</span>
+
+</div>
+
+<button
+id="predictBtn"
+class="predictButton">
+
+Predict Single Phase
+
+</button>
+
+<hr>
+
+<div id="predictionResult">
+
+<h2>
+
+Waiting for Prediction...
+
+</h2>
+
+</div>
+
+<br>
+
+<div class="gaugeContainer">
+
+<canvas id="gaugeChart"></canvas>
+
+</div>
+
+<br>
+
+<div class="featureContainer">
+
+<canvas id="featureChart"></canvas>
+
+</div>
+
+<br>
+
+<button
+id="downloadReport"
+class="predictButton">
+
+Download PDF Report
+
+</button>
+
+</div>
+
+</div>
+
+<footer
+style="
+margin-top:30px;
+text-align:center;
+color:#999;
+font-size:14px;
+">
+
+Developed by <b>Morsalin Hosain Dip</b>
+
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>
