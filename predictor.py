@@ -175,11 +175,11 @@ class Predictor:
 
                 "MixingEntropy": round(
 
-                    physics.get(
+                    physics["dimensionless_entropy"],
 
-                        "mixing_entropy",
+                        
 
-                        1.609
+                        
 
                     ),
 
