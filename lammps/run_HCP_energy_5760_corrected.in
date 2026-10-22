@@ -1,0 +1,50 @@
+clear
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+timestep 0.001
+
+lattice hcp 2.542
+region ebox block 0 12 0 12 0 10 units lattice
+create_box 5 ebox
+create_atoms 1 box
+
+mass 1 58.933194
+mass 2 51.996100
+mass 3 55.845000
+mass 4 54.938044
+mass 5 58.693400
+
+set type 1 type/subset 2 1152 22002
+set type 1 type/subset 3 1152 33003
+set type 1 type/subset 4 1152 44004
+set type 1 type/subset 5 1152 55005
+
+pair_style meam
+pair_coeff * * library.meam Co Ni Cr Fe Mn CoNiCrFeMn.meam Co Cr Fe Mn Ni
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+variable epa equal pe/atoms
+variable hpa equal enthalpy/atoms
+variable vpa equal vol/atoms
+variable rho equal density
+
+thermo 100
+thermo_style custom step temp press pe v_epa enthalpy v_hpa density vol v_vpa lx ly lz
+thermo_modify flush yes
+
+write_data Energy_HCP_initial_corrected_5760.data
+
+fix RELAX all box/relax aniso 0.0 vmax 0.001
+min_style cg
+minimize 1.0e-12 1.0e-12 20000 200000
+unfix RELAX
+run 0
+
+print "phase,atoms,energy_eV_per_atom,enthalpy_eV_per_atom,volume_A3_per_atom,density_g_cm3" file HCP_0K_corrected.csv screen no
+print "HCP,5760,$(v_epa:%.12f),$(v_hpa:%.12f),$(v_vpa:%.12f),$(v_rho:%.12f)" append HCP_0K_corrected.csv screen yes
+
+write_data Energy_HCP_relaxed_0K_corrected_5760.data
+print "CORRECTED 5760-ATOM EQUIMOLAR HCP RUN COMPLETED"

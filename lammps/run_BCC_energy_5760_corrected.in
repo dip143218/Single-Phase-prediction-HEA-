@@ -1,0 +1,66 @@
+# ================================================================
+# 5760-atom equiatomic BCC 0 K molecular-statics screening
+# CoCrFeMnNi with Choi 2NN-MEAM
+#
+# Scientific scope:
+# Choi et al. used the full CMC + temperature ladder for FCC and
+# compared FCC/HCP energies at 0 K. A full BCC temperature ladder
+# is not part of that published workflow. This BCC run is an extra
+# verification to test whether a BCC starting lattice is retained
+# or transforms during unconstrained zero-pressure relaxation.
+# ================================================================
+
+clear
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+timestep 0.001
+
+# BCC has 2 atoms/cell:
+# 12 x 12 x 20 x 2 = 5760 atoms
+lattice bcc 2.853
+region ebox block 0 12 0 12 0 20 units lattice
+create_box 5 ebox
+create_atoms 1 box
+
+mass 1 58.933194
+mass 2 51.996100
+mass 3 55.845000
+mass 4 54.938044
+mass 5 58.693400
+
+# Exact equiatomic composition: 1152 atoms each
+set type 1 type/subset 2 1152 22002
+set type 1 type/subset 3 1152 33003
+set type 1 type/subset 4 1152 44004
+set type 1 type/subset 5 1152 55005
+
+pair_style meam
+pair_coeff * * library.meam Co Ni Cr Fe Mn CoNiCrFeMn.meam Co Cr Fe Mn Ni
+
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+variable epa equal pe/atoms
+variable hpa equal enthalpy/atoms
+variable vpa equal vol/atoms
+variable rho equal density
+
+thermo 100
+thermo_style custom step temp press pe v_epa enthalpy v_hpa density vol v_vpa lx ly lz
+thermo_modify flush yes
+
+write_data Energy_BCC_initial_corrected_5760.data
+
+fix RELAX all box/relax aniso 0.0 vmax 0.001
+min_style cg
+minimize 1.0e-12 1.0e-12 20000 200000
+unfix RELAX
+run 0
+
+print "phase,atoms,energy_eV_per_atom,enthalpy_eV_per_atom,volume_A3_per_atom,density_g_cm3" file BCC_0K_corrected.csv screen no
+print "BCC_start,5760,$(v_epa:%.12f),$(v_hpa:%.12f),$(v_vpa:%.12f),$(v_rho:%.12f)" append BCC_0K_corrected.csv screen yes
+
+write_data Energy_BCC_relaxed_0K_corrected_5760.data
+print "CORRECTED 5760-ATOM EQUIMOLAR BCC SCREEN COMPLETED"

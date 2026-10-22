@@ -1,0 +1,44 @@
+clear
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+variable PHASE index FCC
+
+if "${PHASE} == FCC" then "lattice fcc 3.595"
+if "${PHASE} == FCC" then "region ebox block 0 12 0 12 0 10 units lattice"
+if "${PHASE} == HCP" then "lattice hcp 2.542"
+if "${PHASE} == HCP" then "region ebox block 0 12 0 12 0 20 units lattice"
+if "${PHASE} == BCC" then "lattice bcc 2.853"
+if "${PHASE} == BCC" then "region ebox block 0 12 0 12 0 20 units lattice"
+
+create_box 5 ebox
+create_atoms 1 box
+mass 1 58.933194
+mass 2 51.996100
+mass 3 55.845000
+mass 4 54.938044
+mass 5 58.693400
+set type 1 type/subset 2 1152 22002
+set type 1 type/subset 3 1152 33003
+set type 1 type/subset 4 1152 44004
+set type 1 type/subset 5 1152 55005
+pair_style meam
+pair_coeff * * library.meam Co Ni Cr Fe Mn CoNiCrFeMn.meam Co Cr Fe Mn Ni
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+variable epa equal pe/atoms
+variable hpa equal enthalpy/atoms
+variable vpa equal vol/atoms
+variable rho equal density
+thermo 1000
+thermo_style custom step temp press pe v_epa enthalpy v_hpa density vol v_vpa lx ly lz
+thermo_modify flush yes
+write_data Energy_${PHASE}_initial_5760.data
+fix RELAX all box/relax aniso 0.0 vmax 0.001
+min_style cg
+minimize 1.0e-12 1.0e-12 20000 200000
+unfix RELAX
+run 0
+print "${PHASE},$(v_epa:%.12f),$(v_hpa:%.12f),$(v_vpa:%.12f),$(v_rho:%.12f)" append phase_0K_energies.csv screen yes
+write_data Energy_${PHASE}_relaxed_0K_5760.data
